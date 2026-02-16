@@ -1,0 +1,30 @@
+modLoader="javafml" # 必须是 javafml
+loaderVersion="[40,)" # 允许的 Forge 版本范围
+license="All rights reserved"
+issueTrackerURL="https://change.me.to.your.issue.tracker.url" # 可选
+
+[[mods]] # 这是一个列表，注意双中括号
+modId="jetmod" # 关键！必须和 JetMod.java 里的 MODID 一模一样
+version="1.0.0" # 模组版本
+displayName="Jet Mod" # 模组显示名称（在模组列表里看到的名字）
+displayURL="https://change.me.to.your.mods.homepage" # 可选
+logoFile="examplemod.png" # 即使没有图片也不要删这行，留着占位
+credits="Thanks for this mod course"
+authors="Steve" # 改成你的名字
+description='''
+    这是一个可以让玩家按 V 键喷气的模组。
+    '''
+
+[[dependencies.jetmod]] # 依赖项配置，必须把 examplemod 改成 jetmod
+modId="forge"
+mandatory=true
+versionRange="[40,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.jetmod]] # 依赖 Minecraft
+modId="minecraft"
+mandatory=true
+versionRange="[1.20,1.21.4]" # 支持的版本范围
+ordering="NONE"
+side="BOTH"

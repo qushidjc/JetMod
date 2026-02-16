@@ -1,0 +1,9 @@
+{
+  "jet_fire": {
+    "category": "player",
+    "subtitle": "subtitles.jetmod.jet_fire",
+    "sounds": [
+      "jetmod:jet_fire"
+    ]
+  }
+}
