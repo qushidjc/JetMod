@@ -12,8 +12,8 @@ base {
     archivesName = 'jetmod'
 }
 
-// 1.20.5+ 需要 Java 21
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// 1.20.1 使用 Java 17
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
@@ -54,7 +54,28 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    // 只保留标准库，删除了所有可能连不上的第三方库
+    // 1. 阿里云公共仓库 (下载常规 Java 库最快)
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+
+    // 2. Minecraft 官方库 (专门解决 com.mojang 下载失败/403 的问题)
+    maven {
+        name = "Minecraft"
+        url = "https://libraries.minecraft.net/"
+    }
+
+    // 3. Forge 官方源
+    maven {
+        name = "MinecraftForge"
+        url = "https://maven.minecraftforge.net/"
+    }
+
+    // 4. 备用：BMCLAPI (放在后面，只作为备用)
+    maven {
+        name = "BMCLAPI"
+        url = "https://bmclapi2.bangbang93.com/maven"
+    }
+
+    // 5. 标准中央仓库
     mavenCentral()
 }
 

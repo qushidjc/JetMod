@@ -12,9 +12,8 @@ public class SoundInit {
     public static final DeferredRegister<SoundEvent> SOUNDS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, JetMod.MODID);
 
-    public static final RegistryObject<SoundEvent> JET_FIRE =
-            SOUNDS.register("jet_fire",
-                    () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(JetMod.MODID, "jet_fire")));
+    public static final RegistryObject<SoundEvent> JET_FIRE = SOUNDS.register("jet_fire",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(JetMod.MODID, "jet_fire")));
 
     public static void register(IEventBus eventBus) {
         SOUNDS.register(eventBus);

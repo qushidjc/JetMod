@@ -16,7 +16,6 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.Random;
 
@@ -26,7 +25,7 @@ public class InputEvents {
     public static long lastDashTime = 0;
     public static long jetEndTime = 0;
     public static long assistEndTime = 0;
-    private static Vec3 dashDirection = Vec3.ZERO;
+    private static Vec3 dashDirection = new Vec3(0, 0, 0);
     private static final Random random = new Random();
 
     @SubscribeEvent
@@ -48,8 +47,15 @@ public class InputEvents {
             assistEndTime = jetEndTime + assistDurationMs;
 
             player.playSound(SoundInit.JET_FIRE.get(), 1.0f, 1.0f);
-            NetworkInit.INSTANCE.send(new JetPacket(), PacketDistributor.SERVER.noArg());
 
+            // ✅ 极其稳健的调用方式，如果 NetworkInit.INSTANCE 不为空才发送
+            if (NetworkInit.INSTANCE != null) {
+                NetworkInit.INSTANCE.sendToServer(new JetPacket());
+            } else {
+                System.out.println("JetMod Error: Network Channel is null!");
+            }
+
+            // 运动逻辑保持不变
             float forward = player.input.forwardImpulse;
             float strafe = player.input.leftImpulse;
             if (forward == 0 && strafe == 0) forward = 1.0f;
@@ -68,6 +74,7 @@ public class InputEvents {
         }
     }
 
+    // onPlayerTick 逻辑不需要改动，保持你原来的即可
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END && event.player.level().isClientSide()) {
@@ -76,23 +83,12 @@ public class InputEvents {
 
             long now = System.currentTimeMillis();
 
-            // === 阶段一：喷气中 ===
             if (now < jetEndTime) {
-                // 1. 生成粒子
                 spawn8WayParticles(player);
-
-                // 2. --- 新增：反重力逻辑 ---
                 Vec3 m = player.getDeltaMovement();
-                // 如果当前 Y 轴速度小于 0.05 (正在下坠或不动)，强制设置为 0.05 (微悬浮)
-                // Math.max 确保如果你是朝上飞的，不会被强制拉下来
-                if (m.y < 0.05) {
-                    player.setDeltaMovement(m.x, 0.05, m.z);
-                }
-
-                // 持续重置摔落距离，防止落地摔死
+                if (m.y < 0.05) player.setDeltaMovement(m.x, 0.05, m.z);
                 player.resetFallDistance();
             }
-            // === 阶段二：动能辅助 ===
             else if (now < assistEndTime) {
                 LocalPlayer localPlayer = (LocalPlayer) player;
                 if (localPlayer.input.forwardImpulse != 0 || localPlayer.input.leftImpulse != 0) {
@@ -108,7 +104,6 @@ public class InputEvents {
     private static void spawn8WayParticles(Player player) {
         Vec3 dir = dashDirection.length() == 0 ? player.getForward() : dashDirection;
         Vec3 particleDir = dir.reverse();
-
         for (int i = 0; i < 3; i++) {
             double ox = (random.nextDouble() - 0.5) * 0.5;
             double oy = 0.6 + (random.nextDouble() - 0.5) * 0.2;
