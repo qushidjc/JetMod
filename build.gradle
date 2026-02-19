@@ -21,7 +21,6 @@ minecraft {
     mappings channel: mapping_channel, version: mapping_version
 
     // 开发环境配置
-    reobf = false
     copyIdeResources = true
 
     runs {
